@@ -30,7 +30,6 @@ func main() {
 
 		n, err := conn.Read(buf)
 		fmt.Println("string", string(buf))
-		fmt.Println(buf)
 		fmt.Println(n, err)
 
 	}
