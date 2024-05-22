@@ -31,17 +31,17 @@ func main() {
 }
 
 func ReadResp(conn net.Conn) {
-
+	str := ""
 	for {
-		buf := make([]byte, 1024)
+		buf := make([]byte, 1)
 		n, err := conn.Read(buf)
+
 		if err == io.EOF {
 			break
 		}
-		strResp := string(buf)
-
-		fmt.Println(n, err, strResp)
+		str += string(buf)
 
 	}
+	print(str)
 
 }
