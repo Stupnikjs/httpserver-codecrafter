@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"os"
 )
@@ -25,16 +26,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	buf := make([]byte, 1024)
-	for {
+	//conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 
+}
+
+func ReadResp(conn net.Conn) {
+
+	for {
+		buf := make([]byte, 1024)
 		n, err := conn.Read(buf)
+		if err == io.EOF {
+			break
+		}
 		strResp := string(buf)
 
 		fmt.Println(n, err, strResp)
 
 	}
-
-	//conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 
 }
