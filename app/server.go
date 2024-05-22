@@ -42,6 +42,6 @@ func ReadResp(conn net.Conn) {
 		str += string(buf)
 
 	}
-	print(str)
+	print("str: ", str)
 
 }
