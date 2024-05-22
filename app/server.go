@@ -34,7 +34,7 @@ func ReadResp(conn net.Conn) {
 	str := ""
 	for {
 		buf := make([]byte, 1)
-		n, err := conn.Read(buf)
+		_, err := conn.Read(buf)
 
 		if err == io.EOF {
 			break
