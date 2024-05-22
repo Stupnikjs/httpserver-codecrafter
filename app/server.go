@@ -18,10 +18,13 @@ func HandleRequest(conn net.Conn) {
 		return
 	}
 	reader := bufio.NewReader(bytes.NewBuffer(buffer))
+
+	// reads until '\n'
 	requestLine, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println(err)
 	}
+	// split fields by " "
 	requestFields := strings.Fields(requestLine)
 	if requestFields[1] == "/" {
 		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
@@ -31,7 +34,14 @@ func HandleRequest(conn net.Conn) {
 }
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Println("Logs from your program will appear here!")
+
+	conn := CreateServer()
+
+	defer conn.Close()
+	HandleRequest(conn)
+}
+
+func CreateServer() net.Conn {
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
 		fmt.Println("Failed to bind to port 4221")
@@ -39,10 +49,11 @@ func main() {
 	}
 	defer l.Close()
 	conn, err := l.Accept()
+
 	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
+		fmt.Println("Failed to accept")
 		os.Exit(1)
 	}
-	defer conn.Close()
-	HandleRequest(conn)
+	return conn
+
 }
