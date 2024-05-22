@@ -26,10 +26,15 @@ func main() {
 	}
 
 	buf := make([]byte, 1024)
-	conn.Read(buf)
+	for {
 
-	fmt.Println(string(buf))
-	fmt.Println(buf)
+		n, err := conn.Read(buf)
+		fmt.Println(string(buf))
+		fmt.Println(buf)
+		fmt.Println(n, err)
+
+	}
+
 	//conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 
 }
