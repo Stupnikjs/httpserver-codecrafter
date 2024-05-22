@@ -29,7 +29,7 @@ func main() {
 	for {
 
 		n, err := conn.Read(buf)
-		fmt.Println(string(buf))
+		fmt.Println("string", string(buf))
 		fmt.Println(buf)
 		fmt.Println(n, err)
 
