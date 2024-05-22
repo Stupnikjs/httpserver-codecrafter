@@ -25,6 +25,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	buf := make([]byte, 1024)
+	conn.Read(buf)
+
+	fmt.Println(string(buf))
+	fmt.Println(buf)
+	//conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 
 }
