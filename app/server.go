@@ -29,8 +29,9 @@ func main() {
 	for {
 
 		n, err := conn.Read(buf)
-		fmt.Println("string", string(buf))
-		fmt.Println(n, err)
+		strResp := string(buf)
+
+		fmt.Println(n, err, strResp)
 
 	}
 
