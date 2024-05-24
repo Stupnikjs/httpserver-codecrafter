@@ -8,8 +8,9 @@ import (
 )
 
 func TestHandleRequest(t *testing.T) {
-	var buf, respBuf bytes.Buffer
-	conn := CreateServer()
+	print("here")
+	var buf bytes.Buffer
+	conn := CreateServer(4421)
 
 	req, err := http.NewRequest("GET", "http//localhost:4221", nil)
 
@@ -20,7 +21,8 @@ func TestHandleRequest(t *testing.T) {
 	req.Write(&buf)
 	conn.Write(buf.Bytes())
 
-	conn.Read(respBuf.Bytes())
-	fmt.Println(respBuf.String())
+	HandleRequest(conn)
+
+	defer conn.Close()
 
 }
