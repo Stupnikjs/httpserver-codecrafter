@@ -42,3 +42,7 @@ func CreateServer(port int) net.Conn {
 	return conn
 
 }
+
+func MockRequest() []byte {
+
+}
