@@ -2,47 +2,44 @@ package main
 
 import (
 	"fmt"
+	"io"
+
+	// Uncomment this block to pass the first stage
+	"bufio"
 	"net"
 	"os"
+	"strings"
 )
 
-func HandleRequest(conn net.Conn) {
-	// Read the request
-	buffer := make([]byte, 1024)
-	_, err := conn.Read(buffer)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(buffer))
-
-}
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-
-	conn := CreateServer(4222)
-	defer conn.Close()
-
-	HandleRequest(conn)
-}
-
-func CreateServer(port int) net.Conn {
-	l, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port))
+	fmt.Println("Logs from your program will appear here!")
+	// Uncomment this block to pass the first stage
+	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
-		srt := fmt.Sprintf("Failed to bind to port %d", port)
-		print(srt)
+		fmt.Println("Failed to bind to port 4221")
 		os.Exit(1)
 	}
-	defer l.Close()
 	conn, err := l.Accept()
-
 	if err != nil {
-		fmt.Println("Failed to accept")
+		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	return conn
-
+	conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	defer conn.Close()
+	handleConn(conn)
 }
-
-func MockRequest() []byte {
-
+func handleConn(conn net.Conn) {
+	reader := bufio.NewReader(conn)
+	request, err := reader.ReadString('\n')
+	if err != nil && err != io.EOF {
+		fmt.Println("Error reading request: ", err.Error())
+		return
+	}
+	url := strings.Split(request, " ")[1]
+	if url == "/" {
+		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	} else {
+		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
+	}
 }
