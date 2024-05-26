@@ -61,18 +61,16 @@ func ParseRequest(request string, conn net.Conn) {
 	requestFields := strings.Fields(request)
 	url := requestFields[1]
 
-	paths := []string{
-		"/echo",
-		"/",
+	if _, ok := strings.CutPrefix(url, "/echo/"); ok {
+		respBody := strings.TrimPrefix(url, "/echo/")
+		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
+		conn.Write([]byte(resp))
+		return
 	}
-
-	for _, route := range paths {
-		if _, ok := strings.CutPrefix(url, route); ok {
-			respBody := strings.TrimPrefix(url, "/echo/")
-			resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
-			conn.Write([]byte(resp))
-			return
-		}
+	if url == "/" {
+		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", 0, "")
+		conn.Write([]byte(resp))
+		return
 	}
 
 	respBody := ""
