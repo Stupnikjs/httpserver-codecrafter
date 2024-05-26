@@ -25,7 +25,11 @@ func HandleRequest(conn net.Conn) {
 		fmt.Println(err)
 	}
 
-	ParseRequest(request, conn)
+	headerStr, err := reader.ReadString('\n')
+
+	headers := ParseHeaderStr(headerStr)
+
+	ParseRequest(request, headers, conn)
 
 }
 func main() {
@@ -60,7 +64,7 @@ func ParseRequest(request string, conn net.Conn) {
 	// split fields by " "
 	requestFields := strings.Fields(request)
 	url := requestFields[1]
-
+	fmt.Println(requestFields)
 	if _, ok := strings.CutPrefix(url, "/echo/"); ok {
 		respBody := strings.TrimPrefix(url, "/echo/")
 		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
@@ -68,13 +72,40 @@ func ParseRequest(request string, conn net.Conn) {
 		return
 	}
 	if url == "/" {
-		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", 0, "")
+		head := Headers{
+			"Content-type":   "text/plain",
+			"Content-Length": "0",
+		}
+		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\n%s\r\n%s", head.ToString(), "")
 		conn.Write([]byte(resp))
 		return
 	}
 
+	if url == "/user-agent" {
+		head := Headers{
+			"Content-type":   "text/plain",
+			"Content-Length": "0",
+			"User-Agent":     "",
+		}
+		resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n%s\r\n%s", head.ToString(), "")
+		conn.Write([]byte(resp))
+		return
+	}
 	respBody := ""
-	resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
+	head := Headers{
+		"Content-type":   "text/plain",
+		"Content-Length": "0",
+	}
+
+	resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n%s\r\n%s", head.ToString(), respBody)
 	conn.Write([]byte(resp))
 
+}
+
+func ToString(h map[string]string) string {
+	str := ""
+	for k, v := range h {
+		str += fmt.Sprintf("%s: %s", k, v)
+	}
+	return str + "\r\n"
 }
