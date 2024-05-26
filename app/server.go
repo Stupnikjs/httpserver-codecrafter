@@ -59,8 +59,9 @@ func main() {
 func ParseRequest(request string, conn net.Conn) {
 	// split fields by " "
 	requestFields := strings.Fields(request)
-	fmt.Println(requestFields)
-	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(requestFields[1][1:]), requestFields[1][1:])
+	url := requestFields[1]
+	respBody := strings.TrimPrefix(url, "/echo/")
+	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
 	conn.Write([]byte(resp))
 
 }
