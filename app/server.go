@@ -20,40 +20,47 @@ func HandleRequest(conn net.Conn) {
 	reader := bufio.NewReader(bytes.NewBuffer(buffer))
 
 	// reads until '\n'
-	requestLine, err := reader.ReadString('\n')
+	request, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println(err)
 	}
-	// split fields by " "
-	requestFields := strings.Fields(requestLine)
-	if requestFields[1] == "/" {
-		conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
-	} else {
-		conn.Write([]byte("HTTP/1.1 404 Not Found\r\n\r\n"))
-	}
+
+	ParseRequest(request, conn)
+
 }
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 
-	conn := CreateServer()
-
-	defer conn.Close()
-	HandleRequest(conn)
-}
-
-func CreateServer() net.Conn {
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
 		fmt.Println("Failed to bind to port 4221")
 		os.Exit(1)
 	}
 	defer l.Close()
-	conn, err := l.Accept()
 
 	if err != nil {
 		fmt.Println("Failed to accept")
 		os.Exit(1)
 	}
-	return conn
+
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			fmt.Println("Failed to accept")
+			os.Exit(1)
+		}
+
+		go HandleRequest(conn)
+
+	}
+
+}
+
+func ParseRequest(request string, conn net.Conn) {
+	// split fields by " "
+	requestFields := strings.Fields(request)
+	fmt.Println(requestFields)
+	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n%s", requestFields[1][1:])
+	conn.Write([]byte(resp))
 
 }
