@@ -60,7 +60,7 @@ func ParseRequest(request string, conn net.Conn) {
 	// split fields by " "
 	requestFields := strings.Fields(request)
 	fmt.Println(requestFields)
-	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n%s", requestFields[1][1:])
+	resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n  Content-Length: %d\r\n%s", len(requestFields[1][1:]), requestFields[1][1:])
 	conn.Write([]byte(resp))
 
 }
