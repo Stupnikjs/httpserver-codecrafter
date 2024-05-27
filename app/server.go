@@ -29,6 +29,10 @@ func HandleRequest(conn net.Conn) {
 
 	headerStr, err := reader.ReadString('\n')
 
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	headers := ParseHeaderStr(headerStr)
 
 	ParseRequest(request, headers, conn)
@@ -62,28 +66,28 @@ func main() {
 
 }
 
-func ParseRequest(request string, conn net.Conn) {
+func ParseRequest(request string, headers Headers, conn net.Conn) Request {
 	// split fields by " "
+	req := Request{}
+
+	fmt.Println(headers)
 	requestFields := strings.Fields(request)
-	url := requestFields[1]
+	req.Method = requestFields[0]
+	req.Url = requestFields[1]
+	req.Protocol = requestFields[2]
 	fmt.Println(requestFields)
-	if _, ok := strings.CutPrefix(url, "/echo/"); ok {
-		respBody := strings.TrimPrefix(url, "/echo/")
-		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", len(respBody), respBody)
-		conn.Write([]byte(resp))
-		return
-	}
-	if url == "/" {
+
+	if req.Url == "/" {
 		head := Headers{
 			"Content-type":   "text/plain",
 			"Content-Length": "0",
 		}
 		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\n%s\r\n%s", head.ToString(), "")
 		conn.Write([]byte(resp))
-		return
+		return req
 	}
 
-	if url == "/user-agent" {
+	if req.Url == "/user-agent" {
 		head := Headers{
 			"Content-type":   "text/plain",
 			"Content-Length": "0",
@@ -91,7 +95,7 @@ func ParseRequest(request string, conn net.Conn) {
 		}
 		resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n%s\r\n%s", head.ToString(), "")
 		conn.Write([]byte(resp))
-		return
+		return req
 	}
 	respBody := ""
 	head := Headers{
@@ -104,10 +108,17 @@ func ParseRequest(request string, conn net.Conn) {
 
 }
 
-func ToString(h map[string]string) string {
+func (h Headers) ToString() string {
 	str := ""
 	for k, v := range h {
 		str += fmt.Sprintf("%s: %s", k, v)
 	}
 	return str + "\r\n"
+}
+
+func ParseHeaderStr(str string) Headers {
+	fields := strings.Split(str, "/r/n")
+
+	fmt.Println(fields)
+	return nil
 }
