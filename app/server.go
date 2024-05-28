@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 
 	// Uncomment this block to pass the first stage
@@ -12,32 +11,55 @@ import (
 )
 
 func HandleRequest(conn net.Conn) {
-	// Read the request
-	buffer := make([]byte, 1024)
-	_, err := conn.Read(buffer)
-	if err != nil {
-		fmt.Println("Error reading: ", err.Error())
-		return
+	defer conn.Close()
+	fmt.Println("Connection received")
+	s := bufio.NewScanner(conn)
+	s.Split(bufio.ScanLines)
+	lines := make([]string, 0)
+	for s.Scan() {
+		if text := s.Text(); text != "" {
+			lines = append(lines, text)
+		} else {
+			break
+		}
 	}
-	reader := bufio.NewReader(bytes.NewBuffer(buffer))
-
-	// reads until '\n'
-	request, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println(err)
+	fmt.Println("Request:", strings.Join(lines, ", "))
+	req := parseRequest(lines)
+	pathParts := strings.Split(req.path, "/")[1:]
+	var response *Response
+	switch pathParts[0] {
+	case "":
+		response = NewResponse(200)
+	case "echo":
+		response = NewResponse(200).addTextBody(strings.Join(pathParts[1:], "/"))
+	case "user-agent":
+		response = NewResponse(200).addTextBody(req.headers["User-Agent"])
+	default:
+		response = NewResponse(404)
 	}
 
-	headerStr, err := reader.ReadString('\n')
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	headers := ParseHeaderStr(headerStr)
-
-	ParseRequest(request, headers, conn)
-
+	resStr := response.toString()
+	fmt.Println("Responding:", resStr)
+	conn.Write([]byte(resStr))
 }
+
+func parseRequest(lines []string) *Request {
+	startLine := strings.Split(lines[0], " ")
+	headers := make(map[string]string)
+	for _, line := range lines[1:] {
+		if line != "" {
+			split := strings.Split(line, ": ")
+			headers[split[0]] = split[1]
+		}
+	}
+	return &Request{
+		method:  startLine[0],
+		path:    startLine[1],
+		version: startLine[2],
+		headers: headers,
+	}
+}
+
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 
@@ -64,61 +86,4 @@ func main() {
 
 	}
 
-}
-
-func ParseRequest(request string, headers Headers, conn net.Conn) Request {
-	// split fields by " "
-	req := Request{}
-
-	fmt.Println(headers)
-	requestFields := strings.Fields(request)
-	req.Method = requestFields[0]
-	req.Url = requestFields[1]
-	req.Protocol = requestFields[2]
-	fmt.Println(requestFields)
-
-	if req.Url == "/" {
-		head := Headers{
-			"Content-type":   "text/plain",
-			"Content-Length": "0",
-		}
-		resp := fmt.Sprintf("HTTP/1.1 200 OK\r\n%s\r\n%s", head.ToString(), "")
-		conn.Write([]byte(resp))
-		return req
-	}
-
-	if req.Url == "/user-agent" {
-		head := Headers{
-			"Content-type":   "text/plain",
-			"Content-Length": "0",
-			"User-Agent":     "",
-		}
-		resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n%s\r\n%s", head.ToString(), "")
-		conn.Write([]byte(resp))
-		return req
-	}
-	respBody := ""
-	head := Headers{
-		"Content-type":   "text/plain",
-		"Content-Length": "0",
-	}
-
-	resp := fmt.Sprintf("HTTP/1.1 404 Not Found\r\n%s\r\n%s", head.ToString(), respBody)
-	conn.Write([]byte(resp))
-
-}
-
-func (h Headers) ToString() string {
-	str := ""
-	for k, v := range h {
-		str += fmt.Sprintf("%s: %s", k, v)
-	}
-	return str + "\r\n"
-}
-
-func ParseHeaderStr(str string) Headers {
-	fields := strings.Split(str, "/r/n")
-
-	fmt.Println(fields)
-	return nil
 }
