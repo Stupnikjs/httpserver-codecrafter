@@ -42,11 +42,12 @@ func HandleRequest(conn net.Conn) {
 }
 
 func parseRequest(lines []string) *Request {
-	fmt.Println(lines)
+
 	startLine := strings.Split(lines[0], " ")
-	fmt.Println(startLine)
+
 	headers := make(map[string]string)
 	for _, line := range lines[1:] {
+		fmt.Println(line)
 		if line != "" {
 			split := strings.Split(line, ": ")
 			headers[split[0]] = split[1]
