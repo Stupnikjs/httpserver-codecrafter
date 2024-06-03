@@ -40,7 +40,7 @@ func (resp *Response) toString() string {
 	status := strconv.Itoa(resp.statuscode)
 
 	sb.WriteString(status)
-	sb.WriteString(" ")
+	sb.WriteString(" OK")
 	for key, header := range resp.headers {
 		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
 		sb.WriteString("\r\n")
