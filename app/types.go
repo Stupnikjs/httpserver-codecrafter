@@ -20,9 +20,10 @@ type Response struct {
 	headers    Headers
 }
 
-func NewResponse(statuscode int) *Response {
+func NewResponse(statuscode int, headers Headers) *Response {
 	response := &Response{
 		statuscode: statuscode,
+		headers:    headers,
 	}
 	return response
 }

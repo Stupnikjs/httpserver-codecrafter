@@ -27,17 +27,17 @@ func HandleRequest(conn net.Conn) {
 	var response *Response
 	switch pathParts[0] {
 	case "":
-		response = NewResponse(200)
+		response = NewResponse(200, req.headers)
 	case "echo":
-		response = NewResponse(200).addTextBody(strings.Join(pathParts[1:], "/"))
+		response = NewResponse(200, req.headers).addTextBody(strings.Join(pathParts[1:], "/"))
 	case "user-agent":
-		response = NewResponse(200).addTextBody(req.headers["User-Agent"])
+		response = NewResponse(200, req.headers).addTextBody(req.headers["User-Agent"])
 	default:
-		response = NewResponse(404)
+		response = NewResponse(404, req.headers)
 	}
 
 	resStr := response.toString()
-	fmt.Println(resStr)
+
 	conn.Write([]byte(resStr))
 }
 
