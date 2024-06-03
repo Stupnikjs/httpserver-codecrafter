@@ -42,6 +42,7 @@ func (resp *Response) toString() string {
 		sb.WriteString("\r\n")
 	}
 	sb.WriteString("Content-Type: text/plain")
+	sb.WriteString("\r\n")
 	sb.WriteString(fmt.Sprintf("Content-Length: %d", len(resp.body)))
 	sb.WriteString("\r\n")
 	sb.WriteString("\r\n")
