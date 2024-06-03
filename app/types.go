@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -40,8 +41,8 @@ func (resp *Response) toString() string {
 
 	sb.WriteString(status)
 	sb.WriteString(" ")
-	for _, header := range resp.headers {
-		sb.WriteString(header)
+	for key, header := range resp.headers {
+		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
 		sb.WriteString("\r\n")
 	}
 	sb.WriteString("\r\n")
