@@ -50,6 +50,7 @@ func (resp *Response) toString() string {
 		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
 		sb.WriteString("\r\n")
 	}
+	sb.WriteString("Content-Type: application/x-www-form-urlencoded")
 	sb.WriteString("\r\n")
 	sb.WriteString(resp.body)
 	return sb.String()
