@@ -37,7 +37,7 @@ func HandleRequest(conn net.Conn) {
 	}
 
 	resStr := response.toString()
-
+	fmt.Println(resStr)
 	conn.Write([]byte(resStr))
 }
 
