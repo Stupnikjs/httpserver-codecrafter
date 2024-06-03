@@ -41,10 +41,10 @@ func (resp *Response) toString() string {
 
 	sb.WriteString(status)
 	if status == "200" {
-		sb.WriteString(" OK")
+		sb.WriteString(" OK\r\n")
 	}
 	if status == "404" {
-		sb.WriteString(" NOT FOUND")
+		sb.WriteString(" NOT FOUND\r\n")
 	}
 	for key, header := range resp.headers {
 		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
