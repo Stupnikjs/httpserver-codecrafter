@@ -43,6 +43,7 @@ func (resp *Response) toString() string {
 	}
 	sb.WriteString("Content-Type: text/plain")
 	sb.WriteString("\r\n")
+	sb.WriteString("\r\n")
 	sb.WriteString(resp.body)
 	return sb.String()
 }
