@@ -21,12 +21,10 @@ type Response struct {
 }
 
 func NewResponse(statuscode int) *Response {
-
 	response := &Response{
 		statuscode: statuscode,
 	}
 	return response
-
 }
 
 func (resp *Response) addTextBody(str string) *Response {
@@ -40,6 +38,7 @@ func (resp *Response) toString() string {
 	status := strconv.Itoa(resp.statuscode)
 
 	sb.WriteString(status)
+	sb.WriteString(" ")
 	for _, header := range resp.headers {
 		sb.WriteString(header)
 		sb.WriteString("\r\n")
