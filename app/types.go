@@ -40,7 +40,12 @@ func (resp *Response) toString() string {
 	status := strconv.Itoa(resp.statuscode)
 
 	sb.WriteString(status)
-	sb.WriteString(" OK")
+	if status == "200" {
+		sb.WriteString(" OK")
+	}
+	if status == "404" {
+		sb.WriteString(" NOT FOUND")
+	}
 	for key, header := range resp.headers {
 		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
 		sb.WriteString("\r\n")
