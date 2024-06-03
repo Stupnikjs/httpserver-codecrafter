@@ -6,15 +6,6 @@ import (
 	"strings"
 )
 
-type Headers map[string]string
-
-type Request struct {
-	method  string
-	version string
-	path    string
-	headers Headers
-}
-
 type Response struct {
 	statuscode int
 	body       string
@@ -44,13 +35,13 @@ func (resp *Response) toString() string {
 		sb.WriteString(" OK\r\n")
 	}
 	if status == "404" {
-		sb.WriteString(" NOT FOUND\r\n")
+		sb.WriteString(" Not Found\r\n")
 	}
 	for key, header := range resp.headers {
 		sb.WriteString(fmt.Sprintf("%s: %s", key, header))
 		sb.WriteString("\r\n")
 	}
-	sb.WriteString("Content-Type: application/x-www-form-urlencoded")
+	sb.WriteString("Content-Type: text/plain")
 	sb.WriteString("\r\n")
 	sb.WriteString(resp.body)
 	return sb.String()

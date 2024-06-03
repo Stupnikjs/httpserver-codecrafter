@@ -7,6 +7,15 @@ import (
 	"strings"
 )
 
+type Headers map[string]string
+
+type Request struct {
+	method  string
+	version string
+	path    string
+	headers Headers
+}
+
 func HandleRequest(conn net.Conn) {
 	defer conn.Close()
 	fmt.Println("Connection received")
